@@ -1,42 +1,47 @@
-import itertools
+import sys
 
-def count(item_set, transactions):
-    return sum([1 for transaction in transactions if item_set.issubset(transaction)])
-
-def apriori(transactions, min_support):
-    # 최소 지지도
-    min_support_count = int(min_support * len(transactions) / 100)
+def apriori(transactions, minSup):
+  
+  minSupCount = int(minSup * len(transactions) / 100)
+  freqItemSet = []
+  #input.txt를 참고해서 allItem은 0~19로 고정
+  items = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19]
+  
+  # finds the L1 itemset
+  for item in items:
+    count = 0
+    for set in transactions:
+      if item in set:
+        count += 1
     
-    # 1차 후보 아이템 집합 생성
-    item_set = sorted(list(set(itertools.chain.from_iterable(transactions))))
-    freq_item_set = [frozenset([item]) for item in item_set if count({item}, transactions) >= min_support_count]
-    freq_item_set.sort()
-    freq_item_set = set(freq_item_set)
-    all_freq_item_sets = []
+    if count >= minSupCount:
+      freqItemSet.append({item})
+  
+  # finds the Lk itemset  
+  itemSet = freqItemSet
+  while(itemSet):
     
-    # 후보 아이템 집합 생성
-    k = 2
-    while freq_item_set:
-        all_freq_item_sets.append(freq_item_set)
-        candidate_item_set = set([i.union(j) for i in freq_item_set for j in freq_item_set if len(i.union(j)) == k])
-        freq_item_set = set([item_set for item_set in candidate_item_set if count(item_set, transactions) >= min_support_count])
-        k += 1
     
-    return all_freq_item_sets
+    
+    
+    
+    itemSet = freqItemSet
+  
+  # itemSet
+  # asoItemSet
+  # sup
+  # conf
 
-# 임의로 생성한 데이터
-transactions = [
-    ['apple', 'banana', 'orange'],
-    ['banana', 'melon', 'orange'],
-    ['apple', 'banana', 'melon'],
-    ['apple', 'melon'],
-    ['apple', 'banana', 'melon', 'orange'],
-    ['apple', 'melon', 'orange'],
-    ['banana'],
-    ['apple', 'banana', 'orange']
-]
 
-all_freq_item_sets = apriori(transactions, min_support=0.3)
 
-for freq_item_set in all_freq_item_sets:
-    print(freq_item_set)
+
+# main
+inputFile = open(sys.argv[2], 'r');
+outputFile = open(sys.argv[3], 'w');
+transactions = []
+
+for line in inputFile:
+    lineSet = set(map(int, line.strip().split('\t')))
+    transactions.append(lineSet)
+
+freqItemSets = apriori(transactions, int(sys.argv[1]))
