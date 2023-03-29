@@ -30,6 +30,8 @@ def apriori(transactions, minSup):
       if count >= minSupCount and item not in freqItemSet:
         freqItemSet.append(item)
     
+    if len(freqItemSet) == 0:
+      break;
     allFreqItemSet.append(freqItemSet)  
     k += 1
     
@@ -57,7 +59,7 @@ for i in range(len(allFreqItemSet)):
         subSet = allFreqItemSet[i][k]
         itemSet = superSet - subSet
         asoItemSet = superSet - itemSet
-        if (len(asoItemSet) != 0):
+        if (len(asoItemSet) != 0 and i + j + 2 - len(asoItemSet) == len(itemSet) + len(asoItemSet)):
           supCount = 0
           confCount = 0
           confAll = 0
@@ -74,5 +76,7 @@ for i in range(len(allFreqItemSet)):
             conf = 0
           else:
             conf = format(confCount / confAll * 100, '.2f')
-          outputFile.writelines('\t'.join([str(itemSet), str(asoItemSet), str(sup), str(conf), '\n']))
+          outputFile.writelines('\t'.join([str(itemSet).replace(" ", ""), str(asoItemSet).replace(" ", ""), str(sup), str(conf), '\n']))
 
+inputFile.close()
+outputFile.close()
