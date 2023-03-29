@@ -11,7 +11,7 @@
       "program": "${file}",
       "console": "integratedTerminal",
       "justMyCode": true,
-      "args" : ["30", "input.txt", "output.txt"],
+      "args" : ["5", "input.txt", "output.txt"],
     }
   ]
 }
