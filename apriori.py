@@ -38,45 +38,38 @@ def apriori(transactions, minSup):
   return allFreqItemSet
 
 # main
-inputFile = open(sys.argv[2], 'r');
-outputFile = open(sys.argv[3], 'w');
-transactions = []
+
+with open(sys.argv[2], 'r') as inputFile, open(sys.argv[3], 'w') as outputFile:
+  transactions = [set(map(int, line.strip().split('\t'))) for line in inputFile]
+  tranLength = len(transactions)
+
+  allFreqItemSet = apriori(transactions, int(sys.argv[1]))
 
 
-for line in inputFile:
-  transactions.append(set(map(int, line.strip().split('\t'))))
+  for i in range(len(allFreqItemSet)):
+    for j in range(i+1,len(allFreqItemSet)):
+      for k in range(len(allFreqItemSet[i])):
+        for l in range(len(allFreqItemSet[j])):
+          superSet = allFreqItemSet[j][l]
+          subSet = allFreqItemSet[i][k]
+          itemSet = superSet - subSet
+          asoItemSet = superSet - itemSet
+          if (len(asoItemSet) != 0 and i + j + 2 - len(asoItemSet) == len(itemSet) + len(asoItemSet)):
+            supCount = 0
+            confCount = 0
+            confAll = 0
+            for set in transactions:
+              if superSet.issubset(set):
+                supCount += 1
+              if itemSet.issubset(set):
+                confAll += 1
+                if asoItemSet.issubset(set):
+                  confCount += 1
+                  
+            sup = format(supCount / tranLength * 100, '.2f')
+            if confAll ==0:
+              conf = 0
+            else:
+              conf = format(confCount / confAll * 100, '.2f')
+            outputFile.writelines('\t'.join([str(itemSet).replace(" ", ""), str(asoItemSet).replace(" ", ""), str(sup), str(conf), '\n']))
 
-tranLength = len(transactions)
-
-allFreqItemSet = apriori(transactions, int(sys.argv[1]))
-
-
-for i in range(len(allFreqItemSet)):
-  for j in range(i+1,len(allFreqItemSet)):
-    for k in range(len(allFreqItemSet[i])):
-      for l in range(len(allFreqItemSet[j])):
-        superSet = allFreqItemSet[j][l]
-        subSet = allFreqItemSet[i][k]
-        itemSet = superSet - subSet
-        asoItemSet = superSet - itemSet
-        if (len(asoItemSet) != 0 and i + j + 2 - len(asoItemSet) == len(itemSet) + len(asoItemSet)):
-          supCount = 0
-          confCount = 0
-          confAll = 0
-          for set in transactions:
-            if superSet.issubset(set):
-              supCount += 1
-            if itemSet.issubset(set):
-              confAll += 1
-              if asoItemSet.issubset(set):
-                confCount += 1
-                
-          sup = format(supCount / tranLength * 100, '.2f')
-          if confAll ==0:
-            conf = 0
-          else:
-            conf = format(confCount / confAll * 100, '.2f')
-          outputFile.writelines('\t'.join([str(itemSet).replace(" ", ""), str(asoItemSet).replace(" ", ""), str(sup), str(conf), '\n']))
-
-inputFile.close()
-outputFile.close()
